@@ -11,13 +11,17 @@ services:
       context: .
       dockerfile: Dockerfile.backend  # Use Dockerfile.backend for the backend build
     environment:
-      - MONGO_URI=mongodb://mongo:27017/kenjo  # MongoDB URI for backend connection
+      - MONGO_URI=mongodb://mongo:27019/kenjo  # MongoDB URI for backend connection
     depends_on:
       - mongo  # Ensure MongoDB starts before backend
     restart: always
+    ports:
+      - "8080:8080"
 
   mongo:
     image: mongo:6.0  # MongoDB image
     container_name: mongo  # Container name for easy reference
     volumes:
       - /volume1/docker/schejit/data:/data/db  # Persist MongoDB data on a Docker volume
+    ports:
+      - "27019:27017"
