@@ -41,7 +41,7 @@ services:
     container_name: timeful-frontend
     restart: on-failure:5
     ports:
-      - 8323:80
+      - 8080:80
     depends_on:
       - backend
     environment:
