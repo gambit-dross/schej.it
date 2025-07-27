@@ -1,0 +1,48 @@
+version: '3.9'
+
+services:
+  db:
+    image: mongo:latest
+    container_name: timeful-db
+    restart: on-failure:5
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=kenjo
+      - MONGO_INITDB_ROOT_PASSWORD=kenjo-always-on-time
+      - TZ=America/Chicago
+    volumes:
+      - /volume1/docker/timeful/db:/data/db
+    healthcheck:
+      test:
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  backend:
+    build:
+      context:.
+      dockerfile: backend/Dockerfile
+    container_name: timeful-backend
+    restart: on-failure:5
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - MONGO_URI=mongodb://kenjo:kenjo-always-on-time@db:27017/timeful?authSource=admin
+      - TZ=America/Chicago
+      # Add other backend environment variables here as needed
+      # - SMTP_HOST=${SMTP_HOST}
+      # - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+
+  frontend:
+    build:
+      context:.
+      dockerfile: frontend/Dockerfile
+    container_name: timeful-frontend
+    restart: on-failure:5
+    ports:
+      - 8323:80
+    depends_on:
+      - backend
+    environment:
+      - TZ=America/Chicago
